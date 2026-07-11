@@ -10,7 +10,10 @@ A `.ddiff` file is **not** runnable source. It is a curated reproduction of the 
 
 | File | Subsystem | What it reconstructs |
 |------|-----------|----------------------|
-| [`live-chat.ddiff`](./live-chat.ddiff) | Live Chat | A visitor chat widget bridged to a Telegram support group over SSE + Redis pub/sub, with rich bidirectional attachments (image/video/audio/voice/document), per-session on-disk storage, an authenticated byte-serving route, and full retention/cleanup. |
+| [`live-chat.ddiff`](./live-chat.ddiff) | Live Chat (condensed) | A visitor chat widget bridged to a Telegram support group over SSE + Redis pub/sub, with rich bidirectional attachments (image/video/audio/voice/document), per-session on-disk storage, an authenticated byte-serving route, and full retention/cleanup. Paraphrased with `# intent:` annotations and elided bodies; includes the styling class map and the BUGS FIXED / FEATURES ADDED changelogs. |
+| [`live-chat-verbose.ddiff`](./live-chat-verbose.ddiff) | Live Chat (verbose) | The same subsystem, but reproducing the **full source** of every file (client widget, all API routes, pub/sub, Telegram lib, storage, DB helpers, types, schema, rate-limit, cron, config, styles) with an `# intent:` preface per section, plus a detailed test plan. Use this when you want the exact implementation rather than a paraphrase. |
+
+> **Which one?** Start with `live-chat.ddiff` for the architecture and reasoning; reach for `live-chat-verbose.ddiff` when an agent needs the complete, copy-adaptable code.
 
 > Download the raw file (**Raw** button on GitHub, or `curl`/`wget` the raw URL) and attach it to your coding agent's context.
 
