@@ -995,20 +995,24 @@ export function register() {
 .animate-chat-pulse { animation: chat-pulse 1.5s ease-in-out infinite; }
 #
 # --- element-by-element class map (intent : Tailwind classes) ----------------
-# ROOT wrapper       : fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3
-#   intent: pin the whole widget to the bottom-right; stack panel above bubble.
-# PANEL              : relative w-80 sm:w-96 max-h-[70vh] bg-white rounded-2xl
-#                      shadow-2xl border border-gray-200 flex flex-col overflow-hidden
+# ROOT wrapper       : fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-50 flex
+#                      flex-col items-end gap-2 sm:gap-3
+#   intent: pin the whole widget to the bottom-right; tighter offset/gap on mobile.
+# PANEL              : relative w-[calc(100vw-1.5rem)] sm:w-96 max-w-96 max-h-[80vh]
+#                      sm:max-h-[70vh] bg-white rounded-2xl shadow-2xl border
+#                      border-gray-200 flex flex-col overflow-hidden
 #                      transition-all duration-300 ease-out origin-bottom-right
-#   intent: card that grows from the bubble corner; capped at 70vh, scrolls inside.
+#   intent: near-full-width card on mobile (capped at 96/max-w-96), fixed 96 on
+#           desktop; taller 80vh cap on mobile, 70vh on >=sm; scrolls inside.
 #   open  state add : opacity-100 translate-y-0 scale-100 pointer-events-auto
 #   close state add : opacity-0 translate-y-4 scale-95 pointer-events-none
 #   intent: mount-during-exit pattern (see hasAnimation) drives this enter/leave.
-# HEADER             : bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4
-#                      flex items-center justify-between
+# HEADER             : bg-gradient-to-r from-blue-600 to-indigo-600 text-white
+#                      p-3 sm:p-4 flex items-center justify-between
+#   headset icon     : text-base sm:text-lg   (smaller on mobile)
 #   header title     : font-semibold text-sm ; subtitle text-xs text-blue-100
 #   close (X) button : text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10
-# MESSAGES list      : flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50
+# MESSAGES list      : flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-gray-50
 #   greeting bubble  : text-sm text-gray-600 bg-white p-3 rounded-xl shadow-sm border border-gray-100
 #   msg row wrapper  : flex flex-col max-w-[85%] animate-fade-in-up transition-all duration-300
 #     visitor variant: ml-auto items-end   (align own messages to the right)
@@ -1029,7 +1033,7 @@ export function register() {
 #     text wrapper   : whitespace-pre-wrap break-words   (so captions wrap)
 #   error caption    : text-[10px] text-red-500 mt-1 flex items-center gap-1 (+ warning icon)
 #   timestamp        : text-[10px] text-gray-400 mt-1
-# INTAKE form area   : p-4 bg-white border-t border-gray-100 space-y-2
+# INTAKE form area   : p-3 sm:p-4 bg-white border-t border-gray-100 space-y-2
 #   name/email input : w-full px-3 py-2 text-sm rounded-xl border border-gray-200 bg-white
 #                      text-black placeholder:text-gray-400 focus:outline-none
 #                      focus:ring-2 focus:ring-blue-500 transition-shadow
@@ -1040,33 +1044,42 @@ export function register() {
 #                       text-blue-800 px-2 py-1.5 rounded-lg  (file icon + name + (size) + X remove)
 #                       intent: shown above the row ONLY while a file is staged.
 #   row              : flex items-end gap-2
-#   paperclip button : p-2.5 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50
+#   paperclip button : shrink-0 w-9 h-9 flex items-center justify-center rounded-full
+#                      text-gray-500 hover:text-blue-600 hover:bg-blue-50
 #                      disabled:opacity-50 disabled:cursor-not-allowed transition-colors
 #                      intent: rendered only when attachmentsEnabled; triggers the
-#                      hidden file input; disabled while closed/sending.
+#                      hidden file input; disabled while closed/sending. Fixed 9x9
+#                      + shrink-0 so it never gets squeezed out on narrow widths.
 #   hidden file input: type=file class="hidden" ref=fileInputRef (onChange stages the File)
-#   textarea         : flex-1 resize-none max-h-32 min-h-[2.5rem] px-3 py-2 text-sm rounded-xl
-#                      border border-gray-200 bg-white text-black placeholder:text-gray-400
-#                      focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow
+#   textarea         : flex-1 min-w-0 resize-none max-h-32 min-h-[2.5rem] px-3 py-2 text-sm
+#                      rounded-xl border border-gray-200 bg-white text-black
+#                      placeholder:text-gray-400 focus:outline-none focus:ring-2
+#                      focus:ring-blue-500 transition-shadow
 #                      disabled:opacity-50 disabled:cursor-not-allowed
-#   intent: disabled + "Chat closed" placeholder when session.status === "closed".
-#   send button      : p-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700
+#   intent: min-w-0 lets the textarea shrink so the send button stays in view;
+#           disabled + "Chat closed" placeholder when session.status === "closed".
+#   send button      : shrink-0 w-9 h-9 flex items-center justify-center rounded-full
+#                      bg-blue-600 text-white hover:bg-blue-700
 #                      disabled:opacity-50 disabled:cursor-not-allowed transition-all
 #                      hover:scale-105 active:scale-95   (spinner icon while sending)
-#                      intent: disabled when closed/sending/(no text AND no file).
+#                      intent: fixed 9x9 + shrink-0; disabled when
+#                      closed/sending/(no text AND no file).
 #   extra icons      : faPaperclip (attach), faDownload + faFileLines (doc chip)
 # CLOSE-CONFIRM modal: absolute inset-0 z-50 bg-black/60 flex items-center justify-center p-4
 #   dialog card      : bg-white rounded-xl shadow-xl p-5 w-full max-w-sm text-center
 #   confirm button   : px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 disabled:opacity-50
 #   cancel button    : px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200
-# FLOATING bubble    : group relative w-14 h-14 rounded-full
+# FLOATING bubble    : group relative w-11 h-11 sm:w-14 sm:h-14 rounded-full
 #                      bg-gradient-to-r from-blue-600 to-indigo-600 text-white
 #                      shadow-lg shadow-blue-600/30 flex items-center justify-center
 #                      transition-all duration-300 hover:scale-110 hover:shadow-xl
 #                      hover:shadow-blue-600/40 focus:outline-none focus:ring-4 focus:ring-blue-500/30
-#   unread badge     : absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold
-#                      w-5 h-5 rounded-full flex items-center justify-center border-2 border-white animate-bounce
-#   intent: icon swaps faComments (closed) <-> faTimes (open); badge shows unread.
+#   bubble icon      : text-lg sm:text-2xl   (smaller on mobile)
+#   unread badge     : absolute -top-1 -right-1 bg-red-500 text-white text-[10px] sm:text-xs
+#                      font-bold w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center
+#                      justify-center border-2 border-white animate-bounce
+#   intent: 11x11 bubble on mobile, 14x14 on >=sm; icon swaps faComments (closed)
+#           <-> faTimes (open); badge shows unread.
 #
 # THEME KNOBS: swap the two `from-blue-600 to-indigo-600` gradients + the
 # `bg-blue-600`/`focus:ring-blue-500` accents to rebrand. Dark mode: flip
